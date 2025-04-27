@@ -122,18 +122,6 @@ export function SavePointSidebar({
                   <span>All Clips</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Clock className="h-4 w-4" />
-                  <span>Recent</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Calendar className="h-4 w-4" />
-                  <span>By Date</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
