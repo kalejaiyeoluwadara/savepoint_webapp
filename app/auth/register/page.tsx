@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ApiRoutes } from "@/app/api/apiRoute";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -56,8 +57,10 @@ export default function RegisterPage() {
       }
 
       router.push("/auth/login?registered=true");
+      toast.success("Registration successful! Routing you to login page.");
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");
+      toast.error(err.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -144,7 +147,7 @@ export default function RegisterPage() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
+          <CardFooter className="flex flex-col mt-8 space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <span className="flex items-center justify-center">

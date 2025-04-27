@@ -3,6 +3,7 @@ import { BadgeCheck, Link, Copy, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { ClipType } from "../model/clip";
 import moment from "moment";
+import { toast } from "sonner";
 
 type Clip = {
   _id: string;
@@ -30,6 +31,7 @@ export default function ClipCard({
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
+    toast.info("Copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   };
 

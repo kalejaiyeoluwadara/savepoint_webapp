@@ -19,6 +19,7 @@ import { useMediaQuery } from "@/hooks/use-mobile";
 
 import type { Clip, ClipType } from "@/app/model/clip";
 import { ApiRoutes } from "../api/apiRoute";
+import { EmptyState } from "./savepoint/empty-state";
 
 export function SavePointDashboard() {
   const { data: session, status } = useSession();
@@ -119,7 +120,7 @@ export function SavePointDashboard() {
   };
 
   if (status === "loading" || loading) {
-    return <div className="text-center py-12">Loading...</div>;
+    return <EmptyState onClearFilters={clearFilters} />;
   }
 
   if (status === "unauthenticated") {
@@ -128,7 +129,7 @@ export function SavePointDashboard() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen w-full bg-gray-50 dark:bg-gray-900">
         <SavePointSidebar
           allTags={allTags}
           selectedTags={selectedTags}
