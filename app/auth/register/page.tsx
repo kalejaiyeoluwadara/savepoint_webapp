@@ -4,6 +4,7 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ApiRoutes } from '@/app/api/apiRoute';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -19,7 +20,7 @@ export default function Register() {
     setError('');
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+      const res = await fetch(`${ApiRoutes.BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
