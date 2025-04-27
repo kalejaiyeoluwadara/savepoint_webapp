@@ -1,13 +1,12 @@
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Providers } from './providers';
-import Navbar from './components/Navbar';
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Providers } from "./providers";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: 'SavePoint',
-  description: 'Save links and text across devices',
+  title: "SavePoint",
+  description: "Save links and text across devices",
 };
 
 export default function RootLayout({
@@ -19,10 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">
-            {children}
-          </main>
+          <main className="container mx-auto px-4 py-8">{children}</main>
         </Providers>
       </body>
     </html>
