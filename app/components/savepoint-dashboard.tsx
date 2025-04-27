@@ -139,7 +139,7 @@ export function SavePointDashboard() {
           isMobile={isMobile}
         />
 
-        <div className="flex-1">
+        <div className="flex-1 ">
           <FilterBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}

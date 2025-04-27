@@ -48,7 +48,7 @@ export function FilterBar({
           />
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center md:ml-0 ml-2 gap-2">
         {hasActiveFilters && (
           <Button variant="outline" size="sm" onClick={clearFilters}>
             <X className="mr-1 h-4 w-4" />
