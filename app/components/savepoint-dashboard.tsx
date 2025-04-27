@@ -1,33 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
-import { useMediaQuery } from "@/hooks/use-mobile";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
-import { tagColors } from "@/lib/constants";
-import type { Clip, ClipType } from "@/app/model/clip";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { sampleClips } from "@/data/sample-clips";
 import { SavePointSidebar } from "./savepoint/sidebar";
 import { FilterBar } from "./savepoint/filter-bar";
 import ClipCard from "./ClipCard";
 import { NewClipModal } from "./savepoint/new-clip-modal";
-// import { EmptyState } from "./savepoint/empty-state";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+
+import { cn } from "@/lib/utils";
+import { tagColors } from "@/lib/constants";
+import { useMediaQuery } from "@/hooks/use-mobile";
+
+import type { Clip, ClipType } from "@/app/model/clip";
+import { ApiRoutes } from "../api/apiRoute";
 
 export function SavePointDashboard() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  const [clips, setClips] = useState<Clip[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [isNewClipModalOpen, setIsNewClipModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<ClipType | null>(null);
-  const [isNewClipModalOpen, setIsNewClipModalOpen] = useState(false);
-  const isMobile = useMediaQuery("(max-width: 768px)");
 
-  // Get all unique tags
-  const allTags = Array.from(new Set(sampleClips.flatMap((clip) => clip.tags)));
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/login");
+    }
+  }, [status, router]);
 
-  // Filter clips based on search, tags, and type
-  const filteredClips = sampleClips.filter((clip) => {
+  useEffect(() => {
+    const fetchClips = async () => {
+      if (status !== "authenticated") return;
+
+      try {
+        const res = await fetch(`${ApiRoutes.BASE_URL}/api/clips`, {
+          headers: {
+            Authorization: `Bearer ${session?.user.token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch clips");
+        }
+
+        const data = await res.json();
+        setClips(data.data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchClips();
+  }, [session, status]);
+
+  const allTags = Array.from(new Set(clips.flatMap((clip) => clip.tags)));
+
+  const filteredClips = clips.filter((clip) => {
     const matchesSearch =
       searchQuery === "" ||
       clip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,11 +98,38 @@ export function SavePointDashboard() {
     setSearchQuery("");
   };
 
-  const handleAddNewClip = (newClip: Omit<Clip, "id" | "date">) => {
-    // Here you would typically save the new clip to your database
-    console.log("New clip:", newClip);
-    setIsNewClipModalOpen(false);
+  const addClip = (newClip: Clip) => {
+    setClips([newClip, ...clips]);
   };
+
+  const deleteClip = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this clip?")) return;
+
+    try {
+      const res = await fetch(`${ApiRoutes.BASE_URL}/api/clips/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session?.user.token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete clip");
+      }
+
+      setClips(clips.filter((clip) => clip._id !== id));
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
+  if (status === "loading" || loading) {
+    return <div className="text-center py-12">Loading...</div>;
+  }
+
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   return (
     <SidebarProvider>
@@ -89,6 +156,12 @@ export function SavePointDashboard() {
           />
 
           <main className="container mx-auto p-4">
+            {error && (
+              <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+                {error}
+              </div>
+            )}
+
             {selectedTags.length > 0 && (
               <div className="mb-4 flex flex-wrap gap-2">
                 {selectedTags.map((tag) => (
@@ -108,32 +181,33 @@ export function SavePointDashboard() {
               </div>
             )}
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredClips.map((clip) => (
-                <ClipCard
-                  key={clip.id}
-                  clip={{
-                    ...clip,
-                    _id: String(clip.id),
-                    createdAt: new Date().toISOString(),
-                    url: clip.url ?? undefined,
-                  }}
-                  onTagClick={handleTagSelect}
-                  onDelete={function (): void {
-                    throw new Error("Function not implemented.");
-                  }}
-                />
-              ))}
-            </div>
-
-            {filteredClips.length === 0 && <p>Empty</p>}
+            {filteredClips.length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded">
+                <p className="text-lg text-gray-600">No clips found</p>
+                <p className="text-gray-500">
+                  Try adjusting your filters or search
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {filteredClips.map((clip) => (
+                  <ClipCard
+                    key={clip._id}
+                    clip={clip}
+                    onTagClick={handleTagSelect}
+                    onDelete={() => deleteClip(clip._id)}
+                  />
+                ))}
+              </div>
+            )}
           </main>
         </div>
 
         <NewClipModal
           isOpen={isNewClipModalOpen}
           onOpenChange={setIsNewClipModalOpen}
-          onSave={handleAddNewClip}
+          token={session?.user.token}
+          onAddClip={addClip}
         />
       </div>
     </SidebarProvider>

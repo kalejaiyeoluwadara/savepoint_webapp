@@ -1,11 +1,14 @@
-export type ClipType = "article" | "code" | "quote" | "link";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
 
-export interface Clip {
-  id: number;
+export type ClipType = "article" | "code" | "quote" | "link" | "work";
+
+export type Clip = {
+  _id: string;
   title: string;
-  content: string;
   type: ClipType;
+  content: string;
+  url?: string;
   tags: string[];
-  date: string;
-  url: string | null;
-}
+  createdAt: string;
+};

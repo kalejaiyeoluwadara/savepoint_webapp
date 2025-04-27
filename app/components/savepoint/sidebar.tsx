@@ -71,14 +71,6 @@ export function SavePointSidebar({
               {session ? (
                 <>
                   <SidebarMenuItem>
-                    <Link href="/dashboard" className="w-full">
-                      <SidebarMenuButton isActive={pathname === "/dashboard"}>
-                        <LayoutDashboard className="h-4 w-4" />
-                        <span>Dashboard</span>
-                      </SidebarMenuButton>
-                    </Link>
-                  </SidebarMenuItem>
-                  <SidebarMenuItem>
                     <SidebarMenuButton onClick={() => signOut()}>
                       <LogOut className="h-4 w-4" />
                       <span>Logout</span>

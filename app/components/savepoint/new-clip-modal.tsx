@@ -1,9 +1,7 @@
 "use client";
 
-import type React from "react";
-
 import { useState } from "react";
-import { X, BookOpen, Code, Quote, LinkIcon } from "lucide-react";
+import { X, BookOpen, Code, BadgeAlert, LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,56 +18,100 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { tagColors } from "@/lib/constants";
-import type { Clip, ClipType } from "@/app/model/clip";
+import { ApiRoutes } from "@/app/api/apiRoute";
+import { toast } from "sonner";
 
 interface NewClipModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSave: (clip: Omit<Clip, "id" | "date">) => void;
+  onAddClip: (clip: any) => void;
+  token: string | undefined;
 }
 
 export function NewClipModal({
   isOpen,
   onOpenChange,
-  onSave,
+  onAddClip,
+  token,
 }: NewClipModalProps) {
-  const [newClip, setNewClip] = useState<Omit<Clip, "id" | "date">>({
-    title: "",
-    content: "",
-    type: "article",
-    tags: [],
-    url: null,
-  });
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [clipType, setClipType] = useState<
+    "work" | "code" | "important" | "link"
+  >("work");
+  const [tags, setTags] = useState<string[]>([]);
+  const [url, setUrl] = useState("");
+  const [tagInput, setTagInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleTagInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && e.currentTarget.value.trim() !== "") {
+    if (e.key === "Enter" && tagInput.trim() !== "") {
       e.preventDefault();
-      const newTag = e.currentTarget.value.trim().toLowerCase();
-      if (!newClip.tags.includes(newTag)) {
-        setNewClip({ ...newClip, tags: [...newClip.tags, newTag] });
+      const newTag = tagInput.trim().toLowerCase();
+      if (!tags.includes(newTag)) {
+        setTags([...tags, newTag]);
       }
-      e.currentTarget.value = "";
+      setTagInput("");
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    setNewClip({
-      ...newClip,
-      tags: newClip.tags.filter((tag) => tag !== tagToRemove),
-    });
+    setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(newClip);
-    // Reset form
-    setNewClip({
-      title: "",
-      content: "",
-      type: "article",
-      tags: [],
-      url: null,
-    });
+    setLoading(true);
+    setError("");
+
+    try {
+      // Always add the clipType as a tag
+      const tagsToSend = [...tags];
+      if (!tagsToSend.includes(clipType)) {
+        tagsToSend.push(clipType);
+      }
+
+      const clipData = {
+        title,
+        content,
+        tags: tagsToSend,
+        url: clipType === "link" ? url : undefined,
+      };
+
+      const res = await fetch(`${ApiRoutes.BASE_URL}/api/clips`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(clipData),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.message || "Failed to create clip";
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const data = await res.json();
+      onAddClip(data.data);
+
+      // Reset form
+      toast.success("Clip created successfully!");
+      setTitle("");
+      setContent("");
+      setClipType("work");
+      setTags([]);
+      setUrl("");
+      setTagInput("");
+      onOpenChange(false); // Close modal after success
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -79,52 +121,66 @@ export function NewClipModal({
           <DialogHeader>
             <DialogTitle>Add New Clip</DialogTitle>
             <DialogDescription>
-              Create a new clip to save in your personal library.
+              Create a new clip to save in your library.
             </DialogDescription>
           </DialogHeader>
+
+          {error && (
+            <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+              {error}
+            </div>
+          )}
+
           <div className="grid gap-4 py-4">
+            {/* Title */}
             <div className="grid gap-2">
               <Label htmlFor="title">Title</Label>
               <Input
                 id="title"
-                value={newClip.title}
-                onChange={(e) =>
-                  setNewClip({ ...newClip, title: e.target.value })
-                }
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter a title for your clip"
                 required
               />
             </div>
+
+            {/* Content */}
             <div className="grid gap-2">
               <Label htmlFor="content">Content</Label>
               <Textarea
                 id="content"
-                value={newClip.content}
-                onChange={(e) =>
-                  setNewClip({ ...newClip, content: e.target.value })
-                }
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 placeholder="Enter the content you want to save"
                 className="min-h-[100px]"
                 required
               />
             </div>
+
+            {/* Type */}
             <div className="grid gap-2">
               <Label>Type</Label>
               <RadioGroup
-                value={newClip.type}
-                onValueChange={(value) =>
-                  setNewClip({ ...newClip, type: value as ClipType })
-                }
+                value={clipType}
+                onValueChange={(value) => setClipType(value as any)}
                 className="flex space-x-2"
               >
                 <div className="flex items-center space-x-1">
-                  <RadioGroupItem value="article" id="article" />
+                  <RadioGroupItem value="work" id="work" />
                   <Label
-                    htmlFor="article"
+                    htmlFor="work"
                     className="cursor-pointer flex items-center"
                   >
-                    <BookOpen className="h-4 w-4 mr-1" />
-                    Article
+                    <BookOpen className="h-4 w-4 mr-1" /> Work
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <RadioGroupItem value="important" id="important" />
+                  <Label
+                    htmlFor="important"
+                    className="cursor-pointer flex items-center"
+                  >
+                    <BadgeAlert className="h-4 w-4 mr-1" /> Important
                   </Label>
                 </div>
                 <div className="flex items-center space-x-1">
@@ -133,18 +189,7 @@ export function NewClipModal({
                     htmlFor="code"
                     className="cursor-pointer flex items-center"
                   >
-                    <Code className="h-4 w-4 mr-1" />
-                    Code
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <RadioGroupItem value="quote" id="quote" />
-                  <Label
-                    htmlFor="quote"
-                    className="cursor-pointer flex items-center"
-                  >
-                    <Quote className="h-4 w-4 mr-1" />
-                    Quote
+                    <Code className="h-4 w-4 mr-1" /> Code
                   </Label>
                 </div>
                 <div className="flex items-center space-x-1">
@@ -153,31 +198,32 @@ export function NewClipModal({
                     htmlFor="link"
                     className="cursor-pointer flex items-center"
                   >
-                    <LinkIcon className="h-4 w-4 mr-1" />
-                    Link
+                    <LinkIcon className="h-4 w-4 mr-1" /> Link
                   </Label>
                 </div>
               </RadioGroup>
             </div>
-            {newClip.type === "link" && (
+
+            {/* URL (only if type is link) */}
+            {clipType === "link" && (
               <div className="grid gap-2">
                 <Label htmlFor="url">URL</Label>
                 <Input
                   id="url"
                   type="url"
-                  value={newClip.url || ""}
-                  onChange={(e) =>
-                    setNewClip({ ...newClip, url: e.target.value })
-                  }
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://example.com"
-                  required={newClip.type === "link"}
+                  required
                 />
               </div>
             )}
+
+            {/* Tags */}
             <div className="grid gap-2">
               <Label htmlFor="tags">Tags</Label>
               <div className="flex flex-wrap gap-2 mb-2">
-                {newClip.tags.map((tag) => (
+                {tags.map((tag) => (
                   <Badge
                     key={tag}
                     variant="outline"
@@ -197,6 +243,8 @@ export function NewClipModal({
               <Input
                 id="tags"
                 placeholder="Type a tag and press Enter"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInput}
               />
               <p className="text-xs text-muted-foreground">
@@ -204,15 +252,19 @@ export function NewClipModal({
               </p>
             </div>
           </div>
+
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={loading}
             >
               Cancel
             </Button>
-            <Button type="submit">Save Clip</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Saving..." : "Save Clip"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
