@@ -9,6 +9,7 @@ import { SavePointSidebar } from "./savepoint/sidebar";
 import { FilterBar } from "./savepoint/filter-bar";
 import ClipCard from "./ClipCard";
 import { NewClipModal } from "./savepoint/new-clip-modal";
+import { DeleteClipModal } from "./DeleteClipModal"; // Import the new DeleteClipModal
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 
@@ -31,6 +32,10 @@ export function SavePointDashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedType, setSelectedType] = useState<ClipType | null>(null);
+
+  // Add state for delete modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [clipToDelete, setClipToDelete] = useState<Clip | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -102,25 +107,15 @@ export function SavePointDashboard() {
     setClips([newClip, ...clips]);
   };
 
-  const deleteClip = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this clip?")) return;
+  // Updated to open the delete modal instead of using confirm()
+  const handleDeleteClick = (clip: Clip) => {
+    setClipToDelete(clip);
+    setDeleteModalOpen(true);
+  };
 
-    try {
-      const res = await fetch(`${ApiRoutes.BASE_URL}/api/clips/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${session?.user.token}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to delete clip");
-      }
-
-      setClips(clips.filter((clip) => clip._id !== id));
-    } catch (err: any) {
-      setError(err.message);
-    }
+  // This function will be called after successful deletion
+  const handleDeleteSuccess = (id: string) => {
+    setClips(clips.filter((clip) => clip._id !== id));
   };
 
   if (status === "loading" || loading) {
@@ -195,7 +190,7 @@ export function SavePointDashboard() {
                     key={clip._id}
                     clip={clip}
                     onTagClick={handleTagSelect}
-                    onDelete={() => deleteClip(clip._id)}
+                    onDelete={() => handleDeleteClick(clip)}
                   />
                 ))}
               </div>
@@ -209,6 +204,18 @@ export function SavePointDashboard() {
           token={session?.user.token}
           onAddClip={addClip}
         />
+
+        {/* Add the DeleteClipModal */}
+        {clipToDelete && (
+          <DeleteClipModal
+            isOpen={deleteModalOpen}
+            onOpenChange={setDeleteModalOpen}
+            clipId={clipToDelete._id}
+            clipTitle={clipToDelete.title}
+            token={session?.user.token}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        )}
       </div>
     </SidebarProvider>
   );
