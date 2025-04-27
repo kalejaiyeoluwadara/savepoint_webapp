@@ -22,4 +22,5 @@ export const typeIcons: Record<ClipType, JSX.Element> = {
   code: <Code className="h-4 w-4" />,
   quote: <Quote className="h-4 w-4" />,
   link: <LinkIcon className="h-4 w-4" />,
+  work: <Code className="h-4 w-4" />,
 };
