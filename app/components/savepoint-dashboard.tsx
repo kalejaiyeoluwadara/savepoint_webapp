@@ -9,7 +9,8 @@ import { SavePointSidebar } from "./savepoint/sidebar";
 import { FilterBar } from "./savepoint/filter-bar";
 import ClipCard from "./ClipCard";
 import { NewClipModal } from "./savepoint/new-clip-modal";
-import { DeleteClipModal } from "./DeleteClipModal"; // Import the new DeleteClipModal
+import { DeleteClipModal } from "./DeleteClipModal";
+import EditClipModal from "./EditClipModal";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 
@@ -20,6 +21,7 @@ import { useMediaQuery } from "@/hooks/use-mobile";
 import type { Clip, ClipType } from "@/app/model/clip";
 import { ApiRoutes } from "../api/apiRoute";
 import { EmptyState } from "./savepoint/empty-state";
+import { LoadingState } from "./savepoint/loading-state";
 
 export function SavePointDashboard() {
   const { data: session, status } = useSession();
@@ -37,6 +39,10 @@ export function SavePointDashboard() {
   // Add state for delete modal
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [clipToDelete, setClipToDelete] = useState<Clip | null>(null);
+
+  // Add state for edit modal
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [clipToEdit, setClipToEdit] = useState<Clip | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -119,8 +125,21 @@ export function SavePointDashboard() {
     setClips(clips.filter((clip) => clip._id !== id));
   };
 
+  // Handle edit click
+  const handleEditClick = (clip: Clip) => {
+    setClipToEdit(clip);
+    setEditModalOpen(true);
+  };
+
+  // Handle successful update
+  const handleUpdateSuccess = (updatedClip: Clip) => {
+    setClips(
+      clips.map((clip) => (clip._id === updatedClip._id ? updatedClip : clip))
+    );
+  };
+
   if (status === "loading" || loading) {
-    return <EmptyState onClearFilters={clearFilters} />;
+    return <LoadingState isMobile={isMobile} />;
   }
 
   if (status === "unauthenticated") {
@@ -192,6 +211,7 @@ export function SavePointDashboard() {
                     clip={clip}
                     onTagClick={handleTagSelect}
                     onDelete={() => handleDeleteClick(clip)}
+                    onEdit={handleEditClick}
                   />
                 ))}
               </div>
@@ -215,6 +235,16 @@ export function SavePointDashboard() {
             clipTitle={clipToDelete.title}
             token={session?.user.token}
             onDeleteSuccess={handleDeleteSuccess}
+          />
+        )}
+
+        {/* Add the EditClipModal */}
+        {clipToEdit && (
+          <EditClipModal
+            isOpen={editModalOpen}
+            onClose={() => setEditModalOpen(false)}
+            clip={clipToEdit}
+            onUpdate={handleUpdateSuccess}
           />
         )}
       </div>

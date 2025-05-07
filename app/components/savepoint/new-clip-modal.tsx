@@ -116,8 +116,8 @@ export function NewClipModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
+      <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
+        <form className="flex flex-col w-full gap-3" onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Add New Clip</DialogTitle>
             <DialogDescription>
@@ -131,11 +131,12 @@ export function NewClipModal({
             </div>
           )}
 
-          <div className="grid gap-4 py-4">
+          <div className="flex flex-col gap-2 py-4">
             {/* Title */}
             <div className="grid gap-2">
               <Label htmlFor="title">Title</Label>
               <Input
+                className="w-full"
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -163,13 +164,13 @@ export function NewClipModal({
               <RadioGroup
                 value={clipType}
                 onValueChange={(value) => setClipType(value as any)}
-                className="flex space-x-2"
+                className="flex flex-wrap gap-2"
               >
                 <div className="flex items-center space-x-1">
                   <RadioGroupItem value="work" id="work" />
                   <Label
                     htmlFor="work"
-                    className="cursor-pointer flex items-center"
+                    className="cursor-pointer flex items-center text-sm"
                   >
                     <BookOpen className="h-4 w-4 mr-1" /> Work
                   </Label>
@@ -178,7 +179,7 @@ export function NewClipModal({
                   <RadioGroupItem value="important" id="important" />
                   <Label
                     htmlFor="important"
-                    className="cursor-pointer flex items-center"
+                    className="cursor-pointer flex items-center text-sm"
                   >
                     <BadgeAlert className="h-4 w-4 mr-1" /> Important
                   </Label>
@@ -187,7 +188,7 @@ export function NewClipModal({
                   <RadioGroupItem value="code" id="code" />
                   <Label
                     htmlFor="code"
-                    className="cursor-pointer flex items-center"
+                    className="cursor-pointer flex items-center text-sm"
                   >
                     <Code className="h-4 w-4 mr-1" /> Code
                   </Label>
@@ -196,7 +197,7 @@ export function NewClipModal({
                   <RadioGroupItem value="link" id="link" />
                   <Label
                     htmlFor="link"
-                    className="cursor-pointer flex items-center"
+                    className="cursor-pointer flex items-center text-sm"
                   >
                     <LinkIcon className="h-4 w-4 mr-1" /> Link
                   </Label>
@@ -220,7 +221,7 @@ export function NewClipModal({
             )}
 
             {/* Tags */}
-            <div className="grid gap-2">
+            <div className="grid ">
               <Label htmlFor="tags">Tags</Label>
               <div className="flex flex-wrap gap-2 mb-2">
                 {tags.map((tag) => (
@@ -247,22 +248,27 @@ export function NewClipModal({
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInput}
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs mt-2 text-muted-foreground">
                 Press Enter to add a tag
               </p>
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full sm:w-auto"
+            >
               {loading ? "Saving..." : "Save Clip"}
             </Button>
           </DialogFooter>
