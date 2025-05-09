@@ -245,6 +245,7 @@ export function SavePointDashboard() {
             onClose={() => setEditModalOpen(false)}
             clip={clipToEdit}
             onUpdate={handleUpdateSuccess}
+            token={session?.user.token}
           />
         )}
       </div>

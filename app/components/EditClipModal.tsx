@@ -15,12 +15,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ApiRoutes } from "@/app/api/apiRoute";
 
 type EditClipModalProps = {
   isOpen: boolean;
   onClose: () => void;
   clip: Clip;
   onUpdate: (updatedClip: Clip) => void;
+  token: string | undefined;
 };
 
 export default function EditClipModal({
@@ -28,9 +30,11 @@ export default function EditClipModal({
   onClose,
   clip,
   onUpdate,
+  token,
 }: EditClipModalProps) {
   const [editedClip, setEditedClip] = useState<Clip>(clip);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setEditedClip(clip);
@@ -46,14 +50,34 @@ export default function EditClipModal({
     }));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
+    setError("");
+
     try {
-      onUpdate(editedClip);
+      const res = await fetch(`${ApiRoutes.BASE_URL}/api/clips/${clip._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editedClip),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        const errorMessage = errorData.message || "Failed to update clip";
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const data = await res.json();
+      onUpdate(data.data);
       onClose();
       toast.success("Clip updated successfully!");
-    } catch (error) {
-      toast.error("Failed to update clip");
+    } catch (err: any) {
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -62,19 +86,19 @@ export default function EditClipModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] w-[95vw] max-h-[90vh] overflow-y-auto">
-        <form
-          className="flex flex-col w-full gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSave();
-          }}
-        >
+        <form className="flex flex-col w-full gap-3" onSubmit={handleSave}>
           <DialogHeader>
             <DialogTitle>Edit Clip</DialogTitle>
             <DialogDescription>
               Make changes to your clip here.
             </DialogDescription>
           </DialogHeader>
+
+          {error && (
+            <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+              {error}
+            </div>
+          )}
 
           <div className="flex flex-col gap-2 py-4">
             {/* Title */}
