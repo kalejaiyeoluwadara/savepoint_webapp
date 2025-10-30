@@ -40,7 +40,7 @@ export default function ClipCard({
     clip.content.includes(";");
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 sm:p-6 bg-white shadow-sm w-full relative group">
+    <div className="border border-gray-200 rounded-lg p-4 sm:p-6 bg-white shadow-sm md:w-full w-100 relative group">
       {/* Action buttons that appear on hover or are always visible on mobile */}
       <div className="absolute top-3 right-3 flex space-x-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
         <button
