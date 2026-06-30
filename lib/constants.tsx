@@ -24,3 +24,40 @@ export const typeIcons: Record<ClipType, JSX.Element> = {
   link: <LinkIcon className="h-4 w-4" />,
   work: <Code className="h-4 w-4" />,
 };
+
+// Per-type accent colors used for the card icon chip and left border.
+export const typeAccents: Record<
+  ClipType,
+  { border: string; icon: string }
+> = {
+  article: { border: "border-l-blue-400", icon: "bg-blue-100 text-blue-700" },
+  code: { border: "border-l-emerald-400", icon: "bg-emerald-100 text-emerald-700" },
+  quote: { border: "border-l-amber-400", icon: "bg-amber-100 text-amber-700" },
+  link: { border: "border-l-violet-400", icon: "bg-violet-100 text-violet-700" },
+  work: { border: "border-l-slate-400", icon: "bg-slate-100 text-slate-700" },
+};
+
+// Deterministic fallback palette for tags not present in `tagColors`,
+// so arbitrary user tags still get a stable, consistent color.
+const fallbackTagColors = [
+  "bg-cyan-100 text-cyan-800 hover:bg-cyan-200",
+  "bg-purple-100 text-purple-800 hover:bg-purple-200",
+  "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+  "bg-pink-100 text-pink-800 hover:bg-pink-200",
+  "bg-green-100 text-green-800 hover:bg-green-200",
+  "bg-orange-100 text-orange-800 hover:bg-orange-200",
+  "bg-blue-100 text-blue-800 hover:bg-blue-200",
+  "bg-indigo-100 text-indigo-800 hover:bg-indigo-200",
+  "bg-red-100 text-red-800 hover:bg-red-200",
+  "bg-slate-100 text-slate-800 hover:bg-slate-200",
+];
+
+export function getTagColor(tag: string): string {
+  const known = tagColors[tag];
+  if (known) return known;
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash = (hash * 31 + tag.charCodeAt(i)) >>> 0;
+  }
+  return fallbackTagColors[hash % fallbackTagColors.length];
+}

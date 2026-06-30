@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { tagColors } from "@/lib/constants";
+import { getTagColor } from "@/lib/constants";
 import { ApiRoutes } from "@/app/api/apiRoute";
 import { toast } from "sonner";
 
@@ -228,10 +228,7 @@ export function NewClipModal({
                   <Badge
                     key={tag}
                     variant="outline"
-                    className={cn(
-                      "cursor-pointer",
-                      tagColors[tag] || "bg-gray-100"
-                    )}
+                    className={cn("cursor-pointer", getTagColor(tag))}
                   >
                     {tag}
                     <X

@@ -34,8 +34,8 @@ export function FilterBar({
   setIsNewClipModalOpen,
 }: FilterBarProps) {
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background p-4">
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-10 flex items-center gap-2 border-b bg-background/95 p-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:gap-3 sm:p-4">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         <SidebarTrigger />
         <div className="relative w-full max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -48,11 +48,11 @@ export function FilterBar({
           />
         </div>
       </div>
-      <div className="flex items-center md:ml-0 ml-2 gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         {hasActiveFilters && (
           <Button variant="outline" size="sm" onClick={clearFilters}>
-            <X className="mr-1 h-4 w-4" />
-            Clear Filters
+            <X className="h-4 w-4 sm:mr-1" />
+            <span className="hidden sm:inline">Clear Filters</span>
           </Button>
         )}
         <DropdownMenu>
@@ -77,8 +77,8 @@ export function FilterBar({
           </DropdownMenuContent>
         </DropdownMenu>
         <Button onClick={() => setIsNewClipModalOpen(true)}>
-          <Plus className="mr-1 h-4 w-4" />
-          New Clip
+          <Plus className="h-4 w-4 sm:mr-1" />
+          <span className="hidden sm:inline">New Clip</span>
         </Button>
       </div>
     </header>

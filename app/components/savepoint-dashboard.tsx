@@ -15,7 +15,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
 
 import { cn } from "@/lib/utils";
-import { tagColors } from "@/lib/constants";
+import { getTagColor } from "@/lib/constants";
 import { useMediaQuery } from "@/hooks/use-mobile";
 
 import type { Clip, ClipType } from "@/app/model/clip";
@@ -148,7 +148,7 @@ export function SavePointDashboard() {
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen w-full bg-background">
         <SavePointSidebar
           allTags={allTags}
           selectedTags={selectedTags}
@@ -158,7 +158,7 @@ export function SavePointDashboard() {
           isMobile={isMobile}
         />
 
-        <div className="flex-1 ">
+        <div className="min-w-0 flex-1">
           <FilterBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -170,9 +170,9 @@ export function SavePointDashboard() {
             setIsNewClipModalOpen={setIsNewClipModalOpen}
           />
 
-          <main className="container mx-auto p-4">
+          <main className="w-full p-4 sm:p-6">
             {error && (
-              <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+              <div className="mb-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
                 {error}
               </div>
             )}
@@ -183,10 +183,7 @@ export function SavePointDashboard() {
                   <Badge
                     key={tag}
                     variant="outline"
-                    className={cn(
-                      "cursor-pointer",
-                      tagColors[tag] || "bg-gray-100"
-                    )}
+                    className={cn("cursor-pointer", getTagColor(tag))}
                     onClick={() => handleTagSelect(tag)}
                   >
                     {tag}
@@ -197,14 +194,9 @@ export function SavePointDashboard() {
             )}
 
             {filteredClips.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded">
-                <p className="text-lg text-gray-600">No clips found</p>
-                <p className="text-gray-500">
-                  Try adjusting your filters or search
-                </p>
-              </div>
+              <EmptyState onClearFilters={clearFilters} />
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {filteredClips.map((clip) => (
                   <ClipCard
                     key={clip._id}

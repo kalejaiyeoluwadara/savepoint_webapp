@@ -13,7 +13,7 @@ interface LoadingStateProps {
 export function LoadingState({ isMobile }: LoadingStateProps) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-gray-50 dark:bg-gray-900">
+      <div className="flex min-h-screen w-full bg-background">
         <SavePointSidebar
           allTags={[]}
           selectedTags={[]}
