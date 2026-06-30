@@ -25,16 +25,37 @@ export const typeIcons: Record<ClipType, JSX.Element> = {
   work: <Code className="h-4 w-4" />,
 };
 
-// Per-type accent colors used for the card icon chip and left border.
+// Per-type accent system used across the card: a gradient chip for the type
+// icon, a matching label, and the colored glow the card picks up on hover.
 export const typeAccents: Record<
   ClipType,
-  { border: string; icon: string }
+  { gradient: string; glow: string; label: string }
 > = {
-  article: { border: "border-l-blue-400", icon: "bg-blue-100 text-blue-700" },
-  code: { border: "border-l-emerald-400", icon: "bg-emerald-100 text-emerald-700" },
-  quote: { border: "border-l-amber-400", icon: "bg-amber-100 text-amber-700" },
-  link: { border: "border-l-violet-400", icon: "bg-violet-100 text-violet-700" },
-  work: { border: "border-l-slate-400", icon: "bg-slate-100 text-slate-700" },
+  article: {
+    gradient: "bg-gradient-to-br from-sky-400 to-blue-500",
+    glow: "group-hover:shadow-blue-500/20 group-hover:border-blue-200",
+    label: "Article",
+  },
+  code: {
+    gradient: "bg-gradient-to-br from-emerald-400 to-teal-500",
+    glow: "group-hover:shadow-emerald-500/20 group-hover:border-emerald-200",
+    label: "Code",
+  },
+  quote: {
+    gradient: "bg-gradient-to-br from-amber-400 to-orange-500",
+    glow: "group-hover:shadow-amber-500/20 group-hover:border-amber-200",
+    label: "Quote",
+  },
+  link: {
+    gradient: "bg-gradient-to-br from-violet-500 to-fuchsia-500",
+    glow: "group-hover:shadow-violet-500/20 group-hover:border-violet-200",
+    label: "Link",
+  },
+  work: {
+    gradient: "bg-gradient-to-br from-indigo-400 to-violet-500",
+    glow: "group-hover:shadow-indigo-500/20 group-hover:border-indigo-200",
+    label: "Work",
+  },
 };
 
 // Deterministic fallback palette for tags not present in `tagColors`,

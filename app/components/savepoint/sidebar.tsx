@@ -56,10 +56,12 @@ export function SavePointSidebar({
     <Sidebar variant={isMobile ? "sidebar" : "floating"} collapsible="icon">
       <SidebarHeader>
         <div className="flex items-center gap-2 px-4 py-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <BookOpen className="h-4 w-4 text-primary-foreground" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-500 shadow-sm shadow-violet-600/30">
+            <BookOpen className="h-4 w-4 text-white" />
           </div>
-          <div className="font-semibold">SavePoint</div>
+          <div className="bg-gradient-to-r from-violet-700 to-fuchsia-600 bg-clip-text font-semibold tracking-tight text-transparent">
+            SavePoint
+          </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
