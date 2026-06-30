@@ -87,7 +87,7 @@ export function FilterBar({
         </DropdownMenu>
         <Button
           onClick={() => setIsNewClipModalOpen(true)}
-          className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-md shadow-violet-600/20 transition-shadow hover:from-violet-600 hover:to-fuchsia-600 hover:shadow-lg hover:shadow-violet-600/30"
+          className="rounded-full bg-violet-600 text-white shadow-md shadow-violet-600/20 transition-all hover:bg-violet-700 hover:shadow-lg hover:shadow-violet-600/30"
         >
           <Plus className="h-4 w-4 sm:mr-1" />
           <span className="hidden sm:inline">New Clip</span>

@@ -121,28 +121,8 @@
   }
 }
 
-/* Airy ambient backdrop — soft violet / fuchsia / cyan light pooling behind
-   the workspace so the surface has depth instead of a flat fill. */
+/* Airy workspace backdrop — a soft lavender tint so the surface reads warmer
+   than a flat white and the frosted cards have something to sit against. */
 .app-ambient {
-  background-color: var(--background);
-  background-image:
-    radial-gradient(48rem 48rem at 108% -8%, oklch(0.7 0.18 330 / 0.16), transparent 60%),
-    radial-gradient(44rem 44rem at -10% 0%, oklch(0.62 0.2 290 / 0.16), transparent 58%),
-    radial-gradient(40rem 40rem at 50% 118%, oklch(0.72 0.14 220 / 0.12), transparent 62%);
-  background-attachment: fixed;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .ambient-drift {
-    animation: ambient-drift 24s ease-in-out infinite alternate;
-  }
-}
-
-@keyframes ambient-drift {
-  from {
-    background-position: 0% 0%, 0% 0%, 0% 0%;
-  }
-  to {
-    background-position: 6% 4%, -4% 3%, 3% -4%;
-  }
+  background-color: oklch(0.97 0.012 290);
 }

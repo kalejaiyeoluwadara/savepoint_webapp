@@ -148,7 +148,7 @@ export function SavePointDashboard() {
 
   return (
     <SidebarProvider>
-      <div className="app-ambient ambient-drift flex min-h-screen w-full">
+      <div className="app-ambient flex min-h-screen w-full">
         <SavePointSidebar
           allTags={allTags}
           selectedTags={selectedTags}

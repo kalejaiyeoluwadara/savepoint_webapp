@@ -21,7 +21,7 @@ export function EmptyState({ onClearFilters }: EmptyStateProps) {
         library.
       </p>
       <Button
-        className="mt-5 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-md shadow-violet-600/20 hover:from-violet-600 hover:to-fuchsia-600"
+        className="mt-5 rounded-full bg-violet-600 text-white shadow-md shadow-violet-600/20 hover:bg-violet-700"
         onClick={onClearFilters}
       >
         Clear all filters

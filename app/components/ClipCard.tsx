@@ -68,12 +68,12 @@ export default function ClipCard({
         </button>
       </div>
 
-      {/* Header: gradient type chip + date */}
+      {/* Header: type chip + date */}
       <div className="mb-3 flex w-full items-center gap-2 pr-24">
         <div
           className={cn(
             "flex h-8 w-8 items-center justify-center rounded-xl text-white shadow-sm",
-            accent.gradient
+            accent.chip
           )}
         >
           {typeIcons[clip.type] ?? typeIcons.work}
